@@ -325,6 +325,45 @@ muz-coffee-journey/
 
 ---
 
+## Image Guide
+
+Photos make the site come alive, but large files slow it down. Follow this workflow before adding any image.
+
+### Recommended Sizes
+
+| Image type | Dimensions | Max file size |
+|------------|-----------|---------------|
+| Shop featured image | 1200 × 800 px | 200 KB |
+| Shop gallery images | 1200 × 800 px | 200 KB |
+| Bean image | 800 × 800 px | 150 KB |
+
+### Quick Workflow (macOS)
+
+1. **Resize** — Open the photo in Preview → Tools → Adjust Size → set width to 1200px (or 800 for beans)
+2. **Export as JPEG** — File → Export → Format: JPEG → Quality slider: ~70–80%
+3. **Check file size** — Aim for under 200 KB per image
+4. **Name it** — Use lowercase, hyphens: `fuglen-tokyo-exterior.jpg`, `ethiopia-yirgacheffe.jpg`
+5. **Place it** in the right folder:
+   - Shop photos: `public/images/shops/[shop-name]/`
+   - Bean photos: `public/images/beans/`
+
+### Free Online Alternative
+
+Use [Squoosh](https://squoosh.app/) (made by Google, runs in browser):
+1. Drag your photo in
+2. Pick "MozJPEG" on the right side
+3. Slide quality to ~75
+4. Download — usually cuts file size by 70–90%
+
+### Tips
+
+- **JPEG** for photos (better compression than PNG for real images)
+- **Shoot landscape** for shop photos (cards display 4:3 ratio)
+- **Shoot square** for bean photos (cards display 1:1 ratio)
+- Phone photos are typically 3–5 MB — always compress before committing
+
+---
+
 ## Future Enhancements (Not in v1)
 
 - Dark mode toggle

@@ -8,13 +8,13 @@
 const currentYear = new Date().getFullYear();
 ---
 
-<footer class="bg-espresso text-cream/80 py-8 mt-auto">
+<footer class="bg-espresso dark:bg-night text-cream dark:text-light-text/80 py-8 mt-auto">
   <div class="container mx-auto px-4">
     <div class="flex flex-col md:flex-row items-center justify-between gap-4">
 
       <!-- Copyright and tagline -->
       <div class="text-center md:text-left">
-        <p class="font-heading text-lg text-cream">Coffee Journey</p>
+        <p class="font-heading text-lg text-cream dark:text-light-text">Coffee Journey</p>
         <p class="text-sm mt-1">
           Documenting specialty coffee adventures around the world
         </p>
@@ -27,7 +27,7 @@ const currentYear = new Date().getFullYear();
     </div>
 
     <!-- Copyright line -->
-    <div class="mt-6 pt-4 border-t border-cream/20 text-center text-sm">
+    <div class="mt-6 pt-4 border-t border-cream/20 dark:border-light-text/20 text-center text-sm">
       <p>&copy; {currentYear} Muz's Coffee Journey. All rights reserved.</p>
     </div>
   </div>

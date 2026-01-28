@@ -16,7 +16,29 @@
   --color-gold: #B8860B;          /* Ratings, special highlights */
   --color-sage: #7D8B6F;          /* Origin/region tags */
 
+  /*
+    Dark mode "fixed" colors — these DON'T change between modes.
+    Used for elements that are always dark (footer) or always light (button text).
+  */
+  --color-night: #1C1410;         /* Dark bg for footer/inverted sections in dark mode */
+  --color-night-card: #2A1F18;    /* Slightly lighter dark bg for cards in dark mode */
+  --color-light-text: #F5EDE6;    /* Light text for buttons/inverted sections in dark mode */
+
   /* Font families - will be configured with Google Fonts */
   --font-heading: "Playfair Display", serif;
   --font-body: "Inter", sans-serif;
+}
+
+/*
+  Dark mode: activate with .dark class on <html>.
+  Overrides the main palette so all Tailwind utility classes (bg-cream,
+  text-espresso, etc.) automatically use dark-friendly values.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+.dark {
+  --color-cream: #1C1410;         /* Page bg → deep warm brown */
+  --color-warm-white: #2A1F18;    /* Cards/sections → slightly lighter brown */
+  --color-charcoal: #D4C8BC;      /* Body text → warm off-white */
+  --color-espresso: #F5EDE6;      /* Headings → light cream */
 }

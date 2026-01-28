@@ -67,6 +67,18 @@ const {
 
     <!-- Theme color (colors the browser address bar on mobile) -->
     <meta name="theme-color" content="#3D2314" />
+
+    <!--
+      Dark mode init — runs before page renders to prevent flash of wrong theme.
+      Checks localStorage first, then falls back to system preference.
+      is:inline tells Astro NOT to bundle this — it must run immediately.
+    -->
+    <script is:inline>
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
   </head>
 
   <body class="bg-cream text-charcoal font-body min-h-screen flex flex-col">
@@ -81,5 +93,11 @@ const {
 
     <!-- Site footer -->
     <Footer />
+
+    <!-- Vercel Web Analytics — tracks page views (free, privacy-friendly, no cookies) -->
+    <script>
+      import { inject } from '@vercel/analytics';
+      inject();
+    </script>
   </body>
 </html>

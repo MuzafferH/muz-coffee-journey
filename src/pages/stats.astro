@@ -1,0 +1,219 @@
+---
+/*
+  Statistics Page (/stats)
+  Shows fun numbers about the coffee journey — shops, beans,
+  countries, ratings, and tasting note trends.
+  All data is computed at build time from the content collections.
+*/
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch all content
+const allShops = await getCollection('shops');
+const allBeans = await getCollection('beans');
+
+// --- Compute statistics ---
+
+// Unique countries and cities from shops
+const countries = [...new Set(allShops.map(s => s.data.country))];
+const cities = [...new Set(allShops.map(s => `${s.data.city}, ${s.data.country}`))];
+
+// Average ratings (rounded to 1 decimal)
+const avgShopRating = allShops.length > 0
+  ? (allShops.reduce((sum, s) => sum + s.data.rating, 0) / allShops.length).toFixed(1)
+  : '—';
+const avgBeanRating = allBeans.length > 0
+  ? (allBeans.reduce((sum, b) => sum + b.data.rating, 0) / allBeans.length).toFixed(1)
+  : '—';
+
+// Count tasting notes across all beans (most common first)
+const noteCount: Record<string, number> = {};
+allBeans.forEach(bean => {
+  bean.data.tastingNotes.forEach(note => {
+    noteCount[note] = (noteCount[note] || 0) + 1;
+  });
+});
+const topNotes = Object.entries(noteCount)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 8);
+
+// Roast level breakdown
+const roastCount: Record<string, number> = {};
+allBeans.forEach(bean => {
+  if (bean.data.roastLevel) {
+    roastCount[bean.data.roastLevel] = (roastCount[bean.data.roastLevel] || 0) + 1;
+  }
+});
+const roastBreakdown = Object.entries(roastCount).sort((a, b) => b[1] - a[1]);
+
+// Count tags across all shops
+const tagCount: Record<string, number> = {};
+allShops.forEach(shop => {
+  shop.data.tags?.forEach(tag => {
+    tagCount[tag] = (tagCount[tag] || 0) + 1;
+  });
+});
+const topTags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 6);
+
+// Most recent visit
+const mostRecent = allShops.length > 0
+  ? allShops.sort((a, b) => new Date(b.data.visited).getTime() - new Date(a.data.visited).getTime())[0]
+  : null;
+---
+
+<BaseLayout title="Stats" description="Coffee journey statistics — shops, beans, countries, and tasting notes at a glance">
+  <!-- Page header -->
+  <section class="bg-warm-white py-12">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="font-heading text-4xl md:text-5xl font-bold text-espresso mb-4">
+        Journey Stats
+      </h1>
+      <p class="text-lg text-charcoal/70 max-w-xl mx-auto">
+        The numbers behind the caffeine.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main stats grid -->
+  <section class="py-12 bg-cream">
+    <div class="container mx-auto px-4 max-w-4xl">
+
+      <!-- Big number cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        <!-- Shops visited -->
+        <div class="bg-warm-white rounded-xl p-6 text-center shadow-sm">
+          <p class="text-4xl font-bold text-rust">{allShops.length}</p>
+          <p class="text-sm text-charcoal/60 mt-1">Shops Visited</p>
+        </div>
+
+        <!-- Beans tried -->
+        <div class="bg-warm-white rounded-xl p-6 text-center shadow-sm">
+          <p class="text-4xl font-bold text-rust">{allBeans.length}</p>
+          <p class="text-sm text-charcoal/60 mt-1">Beans Tried</p>
+        </div>
+
+        <!-- Countries -->
+        <div class="bg-warm-white rounded-xl p-6 text-center shadow-sm">
+          <p class="text-4xl font-bold text-rust">{countries.length}</p>
+          <p class="text-sm text-charcoal/60 mt-1">Countries</p>
+        </div>
+
+        <!-- Cities -->
+        <div class="bg-warm-white rounded-xl p-6 text-center shadow-sm">
+          <p class="text-4xl font-bold text-rust">{cities.length}</p>
+          <p class="text-sm text-charcoal/60 mt-1">Cities</p>
+        </div>
+      </div>
+
+      <!-- Ratings section -->
+      <div class="bg-warm-white rounded-xl p-8 shadow-sm mb-8">
+        <h2 class="font-heading text-2xl font-bold text-espresso mb-6">
+          Ratings
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="text-center p-4 bg-cream rounded-lg">
+            <p class="text-3xl font-bold text-gold">{avgShopRating}</p>
+            <p class="text-sm text-charcoal/60 mt-1">Avg. Shop Rating</p>
+          </div>
+          <div class="text-center p-4 bg-cream rounded-lg">
+            <p class="text-3xl font-bold text-gold">{avgBeanRating}</p>
+            <p class="text-sm text-charcoal/60 mt-1">Avg. Bean Rating</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Countries visited -->
+      {countries.length > 0 && (
+        <div class="bg-warm-white rounded-xl p-8 shadow-sm mb-8">
+          <h2 class="font-heading text-2xl font-bold text-espresso mb-4">
+            Countries Visited
+          </h2>
+          <div class="flex flex-wrap gap-2">
+            {countries.map(country => (
+              <span class="px-4 py-2 bg-sage/15 text-sage rounded-full text-sm font-medium">
+                {country}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Top tasting notes -->
+      {topNotes.length > 0 && (
+        <div class="bg-warm-white rounded-xl p-8 shadow-sm mb-8">
+          <h2 class="font-heading text-2xl font-bold text-espresso mb-4">
+            Top Tasting Notes
+          </h2>
+          <div class="space-y-3">
+            {topNotes.map(([note, count]) => (
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-charcoal w-24 text-right">{note}</span>
+                <!-- Visual bar showing relative frequency -->
+                <div class="flex-1 bg-cream rounded-full h-4 overflow-hidden">
+                  <div
+                    class="bg-rust/70 h-full rounded-full"
+                    style={`width: ${(count / topNotes[0][1]) * 100}%`}
+                  />
+                </div>
+                <span class="text-xs text-charcoal/50 w-6">{count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Roast level breakdown -->
+      {roastBreakdown.length > 0 && (
+        <div class="bg-warm-white rounded-xl p-8 shadow-sm mb-8">
+          <h2 class="font-heading text-2xl font-bold text-espresso mb-4">
+            Roast Levels
+          </h2>
+          <div class="flex flex-wrap gap-3">
+            {roastBreakdown.map(([level, count]) => (
+              <div class="bg-rust/10 text-rust rounded-lg px-4 py-3 text-center">
+                <p class="text-2xl font-bold">{count}</p>
+                <p class="text-xs mt-1">{level}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Shop tags breakdown -->
+      {topTags.length > 0 && (
+        <div class="bg-warm-white rounded-xl p-8 shadow-sm mb-8">
+          <h2 class="font-heading text-2xl font-bold text-espresso mb-4">
+            Shop Vibes
+          </h2>
+          <div class="flex flex-wrap gap-2">
+            {topTags.map(([tag, count]) => (
+              <span class="px-3 py-1.5 bg-sage/15 text-sage rounded-full text-sm">
+                {tag} <span class="text-sage/60">({count})</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Most recent visit -->
+      {mostRecent && (
+        <div class="bg-warm-white rounded-xl p-8 shadow-sm">
+          <h2 class="font-heading text-2xl font-bold text-espresso mb-4">
+            Latest Visit
+          </h2>
+          <a href={`/shops/${mostRecent.id}`} class="group inline-block">
+            <p class="text-lg font-heading font-bold text-espresso group-hover:text-rust transition-colors">
+              {mostRecent.data.name}
+            </p>
+            <p class="text-sm text-charcoal/60">
+              {mostRecent.data.city}, {mostRecent.data.country} —
+              {new Date(mostRecent.data.visited).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          </a>
+        </div>
+      )}
+
+    </div>
+  </section>
+</BaseLayout>
