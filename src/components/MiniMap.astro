@@ -1,0 +1,90 @@
+---
+/*
+  MiniMap.astro
+  A smaller, preview map for the home page.
+  Shows all shop pins and links to the full /map page on click.
+
+  Props:
+    - shopData: GeoJSON FeatureCollection of shops
+*/
+
+interface Props {
+  shopData: object; // GeoJSON FeatureCollection
+}
+
+const { shopData } = Astro.props;
+---
+
+<!-- Mini map container -->
+<div class="relative rounded-xl overflow-hidden shadow-sm border border-espresso/10">
+  <!-- The map renders here -->
+  <div id="mini-map" class="w-full h-72 md:h-96"></div>
+
+  <!-- "View full map" overlay link -->
+  <a
+    href="/map"
+    class="absolute bottom-4 right-4 px-4 py-2 bg-espresso/90 text-cream text-sm font-semibold rounded-lg hover:bg-espresso transition-colors z-10"
+  >
+    Open full map →
+  </a>
+</div>
+
+<!-- Pass shop data to client-side script -->
+<script
+  id="mini-map-data"
+  type="application/json"
+  set:html={JSON.stringify(shopData)}
+/>
+
+<!-- MapLibre CSS -->
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" />
+
+<script>
+  import maplibregl from 'maplibre-gl';
+
+  // Read shop data embedded in the page
+  const dataEl = document.getElementById('mini-map-data');
+  const shopGeoJSON = dataEl ? JSON.parse(dataEl.textContent || '{}') : { type: 'FeatureCollection', features: [] };
+
+  const MAPTILER_KEY = import.meta.env.PUBLIC_MAPTILER_KEY;
+
+  // Initialize a simpler map (no zoom controls, limited interaction)
+  const map = new maplibregl.Map({
+    container: 'mini-map',
+    style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
+    center: [20, 30],
+    zoom: 1,
+    interactive: true,          // Allow panning and zooming
+    attributionControl: false,  // Hide attribution on mini map
+  });
+
+  map.on('load', () => {
+    // Add shop data source (no clustering for the mini map)
+    map.addSource('shops', {
+      type: 'geojson',
+      data: shopGeoJSON,
+    });
+
+    // Simple dot markers
+    map.addLayer({
+      id: 'shop-markers',
+      type: 'circle',
+      source: 'shops',
+      paint: {
+        'circle-color': '#C05717',
+        'circle-radius': 7,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#FFFAF5',
+      },
+    });
+
+    // Fit map to show all shops
+    if (shopGeoJSON.features.length > 0) {
+      const bounds = new maplibregl.LngLatBounds();
+      shopGeoJSON.features.forEach((feature: any) => {
+        bounds.extend(feature.geometry.coordinates);
+      });
+      map.fitBounds(bounds, { padding: 40, maxZoom: 10 });
+    }
+  });
+</script>

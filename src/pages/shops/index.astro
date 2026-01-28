@@ -1,0 +1,66 @@
+---
+/*
+  Shops Listing Page (/shops)
+  Displays all coffee shops in a responsive grid.
+  Shops are sorted by visit date (newest first).
+*/
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ShopCard from '../../components/ShopCard.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch all shop entries from the content collection
+const allShops = await getCollection('shops');
+
+// Sort by visit date, newest first
+const shops = allShops.sort((a, b) =>
+  new Date(b.data.visited).getTime() - new Date(a.data.visited).getTime()
+);
+---
+
+<BaseLayout title="Coffee Shops" description="All the specialty coffee shops I've visited around the world">
+  <!-- Page header -->
+  <section class="bg-warm-white py-12">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="font-heading text-4xl md:text-5xl font-bold text-espresso mb-4">
+        Coffee Shops
+      </h1>
+      <p class="text-lg text-charcoal/70 max-w-xl mx-auto">
+        Every shop I've visited, from neighborhood gems to destination cafés.
+      </p>
+      <p class="text-sm text-charcoal/50 mt-2">
+        {shops.length} {shops.length === 1 ? 'shop' : 'shops'} visited so far
+      </p>
+    </div>
+  </section>
+
+  <!-- Shop cards grid -->
+  <section class="py-12 bg-cream">
+    <div class="container mx-auto px-4">
+      {shops.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {shops.map((shop) => (
+            <ShopCard
+              id={shop.id}
+              name={shop.data.name}
+              city={shop.data.city}
+              country={shop.data.country}
+              rating={shop.data.rating}
+              featuredImage={shop.data.featuredImage}
+              tags={shop.data.tags}
+            />
+          ))}
+        </div>
+      ) : (
+        <!-- Empty state when no shops added yet -->
+        <div class="text-center py-16">
+          <p class="text-5xl mb-4">☕</p>
+          <p class="text-charcoal/60 text-lg">No shops added yet.</p>
+          <p class="text-charcoal/40 text-sm mt-2">
+            Add your first shop in <code class="bg-espresso/10 px-2 py-1 rounded">src/content/shops/</code>
+          </p>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,65 @@
+---
+/*
+  Beans Listing Page (/beans)
+  Displays all coffee beans in a responsive grid.
+  Sorted by rating (highest first).
+*/
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BeanCard from '../../components/BeanCard.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch all bean entries from the content collection
+const allBeans = await getCollection('beans');
+
+// Sort by rating, highest first
+const beans = allBeans.sort((a, b) => b.data.rating - a.data.rating);
+---
+
+<BaseLayout title="Coffee Beans" description="All the specialty coffee beans I've tried around the world">
+  <!-- Page header -->
+  <section class="bg-warm-white py-12">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="font-heading text-4xl md:text-5xl font-bold text-espresso mb-4">
+        Coffee Beans
+      </h1>
+      <p class="text-lg text-charcoal/70 max-w-xl mx-auto">
+        Tasting notes and reviews of every bean that made an impression.
+      </p>
+      <p class="text-sm text-charcoal/50 mt-2">
+        {beans.length} {beans.length === 1 ? 'bean' : 'beans'} tasted so far
+      </p>
+    </div>
+  </section>
+
+  <!-- Bean cards grid -->
+  <section class="py-12 bg-cream">
+    <div class="container mx-auto px-4">
+      {beans.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {beans.map((bean) => (
+            <BeanCard
+              id={bean.id}
+              name={bean.data.name}
+              roaster={bean.data.roaster}
+              origin={bean.data.origin}
+              rating={bean.data.rating}
+              tastingNotes={bean.data.tastingNotes}
+              roastLevel={bean.data.roastLevel}
+              image={bean.data.image}
+            />
+          ))}
+        </div>
+      ) : (
+        <!-- Empty state when no beans added yet -->
+        <div class="text-center py-16">
+          <p class="text-5xl mb-4">🫘</p>
+          <p class="text-charcoal/60 text-lg">No beans added yet.</p>
+          <p class="text-charcoal/40 text-sm mt-2">
+            Add your first bean in <code class="bg-espresso/10 px-2 py-1 rounded">src/content/beans/</code>
+          </p>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

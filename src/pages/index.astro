@@ -1,0 +1,155 @@
+---
+/*
+  Home Page (index.astro)
+  The landing page for Muz's Coffee Journey.
+  Shows: Hero section, featured shops, recent beans.
+*/
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ShopCard from '../components/ShopCard.astro';
+import BeanCard from '../components/BeanCard.astro';
+import MiniMap from '../components/MiniMap.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch content and show latest entries on the homepage
+const allShops = await getCollection('shops');
+const allBeans = await getCollection('beans');
+
+// Sort shops by visit date (newest first), show top 3
+const featuredShops = allShops
+  .sort((a, b) => new Date(b.data.visited).getTime() - new Date(a.data.visited).getTime())
+  .slice(0, 3);
+
+// Sort beans by rating (highest first), show top 4
+const topBeans = allBeans
+  .sort((a, b) => b.data.rating - a.data.rating)
+  .slice(0, 4);
+
+// Convert shop locations to GeoJSON for the mini map
+const shopGeoJSON = {
+  type: 'FeatureCollection',
+  features: allShops.map((shop) => ({
+    type: 'Feature',
+    geometry: {
+      type: 'Point',
+      coordinates: [shop.data.coordinates[1], shop.data.coordinates[0]],
+    },
+    properties: {
+      id: shop.id,
+      name: shop.data.name,
+    },
+  })),
+};
+---
+
+<BaseLayout title="Home">
+  <!-- Hero Section -->
+  <section class="bg-warm-white py-16 md:py-24">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="font-heading text-4xl md:text-6xl font-bold text-espresso mb-6">
+        My Coffee Journey
+      </h1>
+      <p class="font-body text-lg md:text-xl text-charcoal/80 max-w-2xl mx-auto mb-8">
+        Exploring specialty coffee shops and beans around the world.
+        One cup at a time.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="/shops"
+          class="px-6 py-3 bg-rust text-cream font-semibold rounded-lg hover:bg-espresso transition-colors"
+        >
+          Explore Shops
+        </a>
+        <a
+          href="/map"
+          class="px-6 py-3 border-2 border-espresso text-espresso font-semibold rounded-lg hover:bg-espresso hover:text-cream transition-colors"
+        >
+          View Map
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Shops -->
+  <section class="py-16 bg-cream">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="font-heading text-3xl font-bold text-espresso">
+          Recent Visits
+        </h2>
+        {allShops.length > 3 && (
+          <a href="/shops" class="text-rust hover:text-espresso text-sm font-medium">
+            View all →
+          </a>
+        )}
+      </div>
+      {featuredShops.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredShops.map((shop) => (
+            <ShopCard
+              id={shop.id}
+              name={shop.data.name}
+              city={shop.data.city}
+              country={shop.data.country}
+              rating={shop.data.rating}
+              featuredImage={shop.data.featuredImage}
+              tags={shop.data.tags}
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="text-center text-charcoal/60 py-8">
+          No shops added yet - your first coffee adventure awaits!
+        </p>
+      )}
+    </div>
+  </section>
+
+  <!-- Top Beans -->
+  <section class="py-16 bg-warm-white">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="font-heading text-3xl font-bold text-espresso">
+          Top Rated Beans
+        </h2>
+        {allBeans.length > 4 && (
+          <a href="/beans" class="text-rust hover:text-espresso text-sm font-medium">
+            View all →
+          </a>
+        )}
+      </div>
+      {topBeans.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {topBeans.map((bean) => (
+            <BeanCard
+              id={bean.id}
+              name={bean.data.name}
+              roaster={bean.data.roaster}
+              origin={bean.data.origin}
+              rating={bean.data.rating}
+              tastingNotes={bean.data.tastingNotes}
+              roastLevel={bean.data.roastLevel}
+              image={bean.data.image}
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="text-center text-charcoal/60 py-8">
+          No beans reviewed yet - time to start tasting!
+        </p>
+      )}
+    </div>
+  </section>
+
+  <!-- Mini Map Preview -->
+  {allShops.length > 0 && (
+    <section class="py-16 bg-cream">
+      <div class="container mx-auto px-4">
+        <h2 class="font-heading text-3xl font-bold text-espresso mb-8 text-center">
+          Where I've Been
+        </h2>
+        <MiniMap shopData={shopGeoJSON} />
+      </div>
+    </section>
+  )}
+</BaseLayout>

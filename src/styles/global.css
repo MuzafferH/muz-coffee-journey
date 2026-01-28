@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/*
+  Custom Theme for Muz's Coffee Journey
+  Color palette inspired by specialty coffee aesthetics
+*/
+@theme {
+  /* Primary colors - the main coffee palette */
+  --color-espresso: #3D2314;      /* Headers, accents - deep coffee brown */
+  --color-rust: #C05717;          /* Buttons, links, interactive elements */
+  --color-cream: #FCF0E0;         /* Page backgrounds - warm cream */
+  --color-warm-white: #FFFAF5;    /* Cards, content sections */
+  --color-charcoal: #2C2C2C;      /* Body text - easy on the eyes */
+
+  /* Accent colors */
+  --color-gold: #B8860B;          /* Ratings, special highlights */
+  --color-sage: #7D8B6F;          /* Origin/region tags */
+
+  /* Font families - will be configured with Google Fonts */
+  --font-heading: "Playfair Display", serif;
+  --font-body: "Inter", sans-serif;
+}

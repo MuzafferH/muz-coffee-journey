@@ -1,0 +1,48 @@
+---
+/*
+  404 Page - Not Found
+  Shown when someone visits a URL that doesn't exist.
+  Keeps the coffee theme with a friendly message.
+*/
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page Not Found">
+  <section class="py-24 md:py-32 bg-cream">
+    <div class="container mx-auto px-4 text-center max-w-lg">
+      <!-- Big coffee cup icon -->
+      <p class="text-8xl mb-6">☕</p>
+
+      <!-- Error heading -->
+      <h1 class="font-heading text-5xl font-bold text-espresso mb-4">
+        404
+      </h1>
+
+      <p class="font-heading text-2xl text-espresso mb-4">
+        This cup is empty
+      </p>
+
+      <p class="text-charcoal/60 mb-8">
+        The page you're looking for doesn't exist, was moved, or perhaps
+        was never brewed in the first place.
+      </p>
+
+      <!-- Navigation options -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="/"
+          class="px-6 py-3 bg-rust text-cream font-semibold rounded-lg hover:bg-espresso transition-colors"
+        >
+          Back to Home
+        </a>
+        <a
+          href="/shops"
+          class="px-6 py-3 border-2 border-espresso text-espresso font-semibold rounded-lg hover:bg-espresso hover:text-cream transition-colors"
+        >
+          Browse Shops
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

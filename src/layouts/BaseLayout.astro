@@ -1,0 +1,76 @@
+---
+/*
+  BaseLayout.astro
+  The main layout wrapper for all pages.
+  Includes: Google Fonts, Tailwind CSS, Header, Footer
+*/
+
+// Import our Tailwind styles (includes custom coffee color palette)
+import '../styles/global.css';
+
+// Import shared components
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// Props this layout accepts from pages
+interface Props {
+  title: string;           // Page title shown in browser tab
+  description?: string;    // Meta description for SEO
+}
+
+// Destructure props with defaults
+const {
+  title,
+  description = "Muz's personal journey through specialty coffee around the world"
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Basic meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!--
+      Google Fonts: Playfair Display (headings) + Inter (body)
+      Using 'display=swap' for better loading performance
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Page title -->
+    <title>{title} | Muz's Coffee Journey</title>
+
+    <!-- Open Graph meta tags (for social media sharing previews) -->
+    <meta property="og:title" content={`${title} | Muz's Coffee Journey`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Muz's Coffee Journey" />
+
+    <!-- Theme color (colors the browser address bar on mobile) -->
+    <meta name="theme-color" content="#3D2314" />
+  </head>
+
+  <body class="bg-cream text-charcoal font-body min-h-screen flex flex-col">
+    <!-- Site header with navigation -->
+    <Header />
+
+    <!-- Main content area - grows to fill available space -->
+    <main class="flex-grow">
+      <!-- slot is where page content gets inserted -->
+      <slot />
+    </main>
+
+    <!-- Site footer -->
+    <Footer />
+  </body>
+</html>

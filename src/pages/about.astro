@@ -1,0 +1,81 @@
+---
+/*
+  About Page
+  Muz's coffee journey story and background.
+*/
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About" description="The story behind my specialty coffee journey">
+  <!-- Hero section -->
+  <section class="bg-warm-white py-16">
+    <div class="container mx-auto px-4 max-w-3xl">
+      <h1 class="font-heading text-4xl md:text-5xl font-bold text-espresso mb-6 text-center">
+        About This Journey
+      </h1>
+      <p class="text-lg text-charcoal/80 text-center">
+        One person's quest to find the perfect cup, one city at a time.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="py-12 bg-cream">
+    <div class="container mx-auto px-4 max-w-3xl">
+      <div class="bg-warm-white rounded-xl p-8 md:p-12 shadow-sm">
+
+        <h2 class="font-heading text-2xl font-bold text-espresso mb-4">
+          How It Started
+        </h2>
+        <p class="text-charcoal mb-6 leading-relaxed">
+          It began with a flat white in Melbourne. I was used to thinking of coffee as just caffeine
+          delivery - something to get through morning meetings. But that first sip of properly
+          extracted specialty coffee changed everything. The complexity, the fruit notes, the way
+          it tasted nothing like the bitter brew I'd been drinking my whole life.
+        </p>
+
+        <h2 class="font-heading text-2xl font-bold text-espresso mb-4">
+          The Mission
+        </h2>
+        <p class="text-charcoal mb-6 leading-relaxed">
+          Now, wherever I travel, finding great coffee is part of the adventure. This site is my
+          way of documenting those discoveries - the hidden gems, the beans worth seeking out,
+          and the shops that remind me why specialty coffee is worth the hunt.
+        </p>
+
+        <h2 class="font-heading text-2xl font-bold text-espresso mb-4">
+          What I Look For
+        </h2>
+        <ul class="text-charcoal mb-6 space-y-2">
+          <li class="flex items-start gap-2">
+            <span class="text-rust font-bold">→</span>
+            <span><strong>Quality over convenience</strong> - Third wave shops that care about sourcing and extraction</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-rust font-bold">→</span>
+            <span><strong>Atmosphere matters</strong> - Spaces designed for enjoying coffee, not just grabbing it</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-rust font-bold">→</span>
+            <span><strong>Light to medium roasts</strong> - I want to taste the origin, not the roaster's char</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-rust font-bold">→</span>
+            <span><strong>Filter coffee</strong> - Pour-over, Aeropress, batch brew - that's my preference</span>
+          </li>
+        </ul>
+
+        <h2 class="font-heading text-2xl font-bold text-espresso mb-4">
+          About Me
+        </h2>
+        <p class="text-charcoal leading-relaxed">
+          I'm Muz - operations person by trade, coffee enthusiast by choice. When I'm not
+          optimizing logistics or building dashboards, you'll find me researching the next
+          coffee shop to visit or experimenting with brew ratios at home.
+        </p>
+
+      </div>
+    </div>
+  </section>
+</BaseLayout>

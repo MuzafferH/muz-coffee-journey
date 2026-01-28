@@ -1,0 +1,105 @@
+---
+/*
+  Header.astro
+  Site navigation header with logo and nav links.
+  Responsive: hamburger menu on mobile, horizontal nav on desktop.
+*/
+
+// Get the current page path to highlight active nav item
+const currentPath = Astro.url.pathname;
+
+// Navigation links - easy to add/remove pages here
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/shops', label: 'Shops' },
+  { href: '/beans', label: 'Beans' },
+  { href: '/map', label: 'Map' },
+  { href: '/about', label: 'About' },
+];
+
+// Helper to check if a link is active
+function isActive(href: string): boolean {
+  if (href === '/') {
+    return currentPath === '/';
+  }
+  return currentPath.startsWith(href);
+}
+---
+
+<header class="bg-warm-white border-b border-espresso/10">
+  <nav class="container mx-auto px-4 py-4">
+    <div class="flex items-center justify-between">
+
+      <!-- Logo / Site name -->
+      <a href="/" class="font-heading text-2xl font-bold text-espresso hover:text-rust transition-colors">
+        Coffee Journey
+      </a>
+
+      <!-- Desktop navigation (hidden on mobile) -->
+      <ul class="hidden md:flex items-center gap-8">
+        {navLinks.map(link => (
+          <li>
+            <a
+              href={link.href}
+              class:list={[
+                'font-body text-sm uppercase tracking-wide transition-colors',
+                isActive(link.href)
+                  ? 'text-rust font-semibold'      /* Active link style */
+                  : 'text-charcoal hover:text-rust' /* Default link style */
+              ]}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <!-- Mobile menu button (hidden on desktop) -->
+      <button
+        id="mobile-menu-button"
+        class="md:hidden p-2 text-espresso hover:text-rust"
+        aria-label="Open menu"
+        aria-expanded="false"
+      >
+        <!-- Hamburger icon (3 horizontal lines) -->
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile navigation menu (hidden by default) -->
+    <ul id="mobile-menu" class="hidden md:hidden mt-4 pb-4 space-y-3">
+      {navLinks.map(link => (
+        <li>
+          <a
+            href={link.href}
+            class:list={[
+              'block py-2 font-body text-sm uppercase tracking-wide transition-colors',
+              isActive(link.href)
+                ? 'text-rust font-semibold'
+                : 'text-charcoal hover:text-rust'
+            ]}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<!-- Simple JavaScript to toggle mobile menu -->
+<script>
+  const menuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  menuButton?.addEventListener('click', () => {
+    // Toggle the 'hidden' class to show/hide menu
+    mobileMenu?.classList.toggle('hidden');
+
+    // Update aria-expanded for accessibility
+    const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+    menuButton.setAttribute('aria-expanded', String(!isExpanded));
+  });
+</script>

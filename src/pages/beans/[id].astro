@@ -1,0 +1,144 @@
+---
+/*
+  Bean Detail Page (/beans/[id])
+  Displays full details for a single coffee bean.
+  The [id] in the filename tells Astro to create one page per bean.
+*/
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Rating from '../../components/Rating.astro';
+import ShopCard from '../../components/ShopCard.astro';
+import { getCollection, render } from 'astro:content';
+
+// Generate a page for each bean in the collection
+export async function getStaticPaths() {
+  const beans = await getCollection('beans');
+  return beans.map((bean) => ({
+    params: { id: bean.id },
+    props: { bean },
+  }));
+}
+
+// Get the bean data for this page
+const { bean } = Astro.props;
+const { data } = bean;
+
+// Render the markdown body content
+const { Content } = await render(bean);
+
+// Fetch linked shops (where this bean was tried)
+const allShops = await getCollection('shops');
+const linkedShops = data.triedAt
+  ? allShops.filter(shop => data.triedAt!.includes(shop.id))
+  : [];
+---
+
+<BaseLayout title={data.name} description={`${data.name} by ${data.roaster} - tasting notes and review`}>
+  <!-- Hero header -->
+  <section class="bg-warm-white py-12">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <!-- Back link -->
+      <a href="/beans" class="text-rust hover:text-espresso text-sm mb-6 inline-block">
+        ← Back to all beans
+      </a>
+
+      <h1 class="font-heading text-4xl md:text-5xl font-bold text-espresso mb-3">
+        {data.name}
+      </h1>
+
+      <!-- Roaster and origin -->
+      <p class="text-lg text-charcoal/70">
+        {data.roaster} · {data.origin}{data.region ? `, ${data.region}` : ''}
+      </p>
+
+      <!-- Rating -->
+      <div class="mt-4">
+        <Rating rating={data.rating} size="lg" />
+      </div>
+
+      <!-- Bean details as badges -->
+      <div class="mt-4 flex flex-wrap gap-3">
+        {data.process && (
+          <span class="text-sm px-3 py-1.5 bg-espresso/10 text-espresso rounded-full">
+            {data.process}
+          </span>
+        )}
+        {data.roastLevel && (
+          <span class="text-sm px-3 py-1.5 bg-rust/10 text-rust rounded-full">
+            {data.roastLevel} Roast
+          </span>
+        )}
+      </div>
+
+      <!-- Tasting notes -->
+      <div class="mt-6">
+        <h2 class="text-sm uppercase tracking-wide text-charcoal/50 mb-2">
+          Tasting Notes
+        </h2>
+        <div class="flex flex-wrap gap-2">
+          {data.tastingNotes.map((note: string) => (
+            <span class="px-3 py-1.5 bg-sage/15 text-sage rounded-full text-sm font-medium">
+              {note}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bean image (if available) -->
+  {data.image && (
+    <section class="bg-cream py-8">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="rounded-xl overflow-hidden bg-espresso/5 aspect-video max-w-md mx-auto relative">
+          <img
+            src={data.image}
+            alt={`${data.name} by ${data.roaster}`}
+            class="w-full h-full object-cover"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="w-full h-full items-center justify-center absolute inset-0 hidden">
+            <span class="text-6xl">🫘</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Markdown body content (tasting notes) -->
+  <section class="py-12 bg-cream">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <div class="bg-warm-white rounded-xl p-8 md:p-12 shadow-sm prose prose-lg max-w-none
+                  prose-headings:font-heading prose-headings:text-espresso
+                  prose-p:text-charcoal prose-p:leading-relaxed
+                  prose-strong:text-espresso
+                  prose-a:text-rust hover:prose-a:text-espresso">
+        <Content />
+      </div>
+    </div>
+  </section>
+
+  <!-- Linked shops (where this bean was tried) -->
+  {linkedShops.length > 0 && (
+    <section class="py-12 bg-warm-white">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <h2 class="font-heading text-2xl font-bold text-espresso mb-6">
+          Tried At
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {linkedShops.map((shop) => (
+            <ShopCard
+              id={shop.id}
+              name={shop.data.name}
+              city={shop.data.city}
+              country={shop.data.country}
+              rating={shop.data.rating}
+              featuredImage={shop.data.featuredImage}
+              tags={shop.data.tags}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>

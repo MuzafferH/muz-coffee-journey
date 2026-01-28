@@ -1,0 +1,177 @@
+---
+/*
+  Shop Detail Page (/shops/[id])
+  Displays full details for a single coffee shop.
+  The [id] in the filename tells Astro to create one page per shop.
+*/
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Rating from '../../components/Rating.astro';
+import BeanCard from '../../components/BeanCard.astro';
+import { getCollection, render } from 'astro:content';
+
+// Generate a page for each shop in the collection
+export async function getStaticPaths() {
+  const shops = await getCollection('shops');
+  return shops.map((shop) => ({
+    params: { id: shop.id },
+    props: { shop },
+  }));
+}
+
+// Get the shop data for this page
+const { shop } = Astro.props;
+const { data } = shop;
+
+// Render the markdown body content
+const { Content } = await render(shop);
+
+// Format the visit date nicely
+const visitDate = new Date(data.visited).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+// Fetch linked beans (if any)
+const allBeans = await getCollection('beans');
+const linkedBeans = data.beans
+  ? allBeans.filter(bean => data.beans!.includes(bean.id))
+  : [];
+---
+
+<BaseLayout title={data.name} description={`${data.name} - a specialty coffee shop in ${data.city}, ${data.country}`}>
+  <!-- Hero header with shop name and key info -->
+  <section class="bg-warm-white py-12">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <!-- Back link -->
+      <a href="/shops" class="text-rust hover:text-espresso text-sm mb-6 inline-block">
+        ← Back to all shops
+      </a>
+
+      <h1 class="font-heading text-4xl md:text-5xl font-bold text-espresso mb-3">
+        {data.name}
+      </h1>
+
+      <!-- Location and date -->
+      <p class="text-lg text-charcoal/70">
+        {data.neighborhood ? `${data.neighborhood}, ` : ''}{data.city}, {data.country}
+      </p>
+      <p class="text-sm text-charcoal/50 mt-1">
+        Visited {visitDate}
+      </p>
+
+      <!-- Rating -->
+      <div class="mt-4">
+        <Rating rating={data.rating} size="lg" />
+      </div>
+
+      <!-- Tags -->
+      {data.tags && data.tags.length > 0 && (
+        <div class="mt-4 flex flex-wrap gap-2">
+          {data.tags.map((tag: string) => (
+            <span class="text-sm px-3 py-1 bg-sage/15 text-sage rounded-full">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <!-- Links -->
+      <div class="mt-4 flex flex-wrap gap-4">
+        {data.website && (
+          <a href={data.website} target="_blank" rel="noopener" class="text-sm text-rust hover:text-espresso">
+            🌐 Website
+          </a>
+        )}
+        {data.instagram && (
+          <span class="text-sm text-charcoal/60">
+            📷 {data.instagram}
+          </span>
+        )}
+        {data.googleMaps && (
+          <a href={data.googleMaps} target="_blank" rel="noopener" class="text-sm text-rust hover:text-espresso">
+            📍 Google Maps
+          </a>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured image -->
+  <section class="bg-cream py-8">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <div class="rounded-xl overflow-hidden bg-espresso/5 aspect-video relative">
+        <img
+          src={data.featuredImage}
+          alt={data.name}
+          class="w-full h-full object-cover"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <!-- Placeholder shown when image fails to load -->
+        <div class="w-full h-full items-center justify-center absolute inset-0 hidden">
+          <span class="text-6xl">☕</span>
+          <p class="text-charcoal/40 ml-3">Photo coming soon</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Image gallery (if additional photos exist) -->
+  {data.gallery && data.gallery.length > 0 && (
+    <section class="bg-cream pb-8">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {data.gallery.map((img: string, i: number) => (
+            <div class="rounded-lg overflow-hidden bg-espresso/5 aspect-square">
+              <img
+                src={img}
+                alt={`${data.name} photo ${i + 1}`}
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Markdown body content (visit notes) -->
+  <section class="py-12 bg-cream">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <div class="bg-warm-white rounded-xl p-8 md:p-12 shadow-sm prose prose-lg max-w-none
+                  prose-headings:font-heading prose-headings:text-espresso
+                  prose-p:text-charcoal prose-p:leading-relaxed
+                  prose-strong:text-espresso
+                  prose-a:text-rust hover:prose-a:text-espresso">
+        <Content />
+      </div>
+    </div>
+  </section>
+
+  <!-- Linked beans section -->
+  {linkedBeans.length > 0 && (
+    <section class="py-12 bg-warm-white">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <h2 class="font-heading text-2xl font-bold text-espresso mb-6">
+          Beans Tried Here
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {linkedBeans.map((bean) => (
+            <BeanCard
+              id={bean.id}
+              name={bean.data.name}
+              roaster={bean.data.roaster}
+              origin={bean.data.origin}
+              rating={bean.data.rating}
+              tastingNotes={bean.data.tastingNotes}
+              roastLevel={bean.data.roastLevel}
+              image={bean.data.image}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>
